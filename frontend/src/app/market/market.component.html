@@ -1,0 +1,27 @@
+<!--<button (click)="goBack()" class="btn-toolbar" title="Go Back"><<</button>-->
+<div *ngIf="market; then thenBlock"> ... </div>
+  <ng-template #thenBlock>
+    <h2><a href="https://www.tradingview.com/chart/?symbol={{market.currencyName+market.baseCurrencyName}}">{{market.name| uppercase}}</a> Details</h2>
+    <div class="row">
+      <div class="col-md-2">
+        <img [src]="market.logoUrl" alt="Image Not Found" class="market-detail-image img-thumbnail">
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="marketName">Name:</label>
+          <input [(ngModel)]="market.name" placeholder="name" class="form-control" id="marketName" disabled>
+        </div>
+        <div class="form-group">
+          <label for="delta">Delta (%):</label>
+          <input [(ngModel)]="market.delta" placeholder="delta" class="form-control" id="delta" disabled>
+        </div>
+        <div class="form-group">
+          <label for="minTradeSize">Min. Trade Size:</label>
+          <input [(ngModel)]="market.minTradeSize" placeholder="minTradeSize" class="form-control" id="minTradeSize" disabled>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="chart">
+      <canvas id="canvas">{{ chart }}</canvas>
+    </div>
+  </ng-template>
