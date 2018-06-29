@@ -15,6 +15,7 @@ public interface MarketLogEntryService {
     List<MarketLogEntry> findByMarket(Market market);
     List<MarketLogEntry> findByImportanceGreaterThanEqual(Integer importance);
     List<MarketLogEntry> findByMarketAndFromStampAndToStamp(Market market, Date fromStamp, Date toStamp);
+    List<MarketLogEntry> findBySuccessAndImportanceGreaterThanEqual(Boolean success, Integer importance);
 
 
     MarketLogEntry save(MarketLogEntry marketLogEntry);

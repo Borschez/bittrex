@@ -2,6 +2,7 @@ package ru.borsch.bittrex.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jdk.nashorn.internal.ir.annotations.Ignore;
+import org.hibernate.annotations.LazyCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.borsch.bittrex.components.CommonHelper;
@@ -25,7 +26,7 @@ public class Market {
     private String name;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "market")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "market")
     @OrderBy("timeStamp ASC")
     private List<Ticker> tickers;
 

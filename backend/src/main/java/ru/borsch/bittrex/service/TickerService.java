@@ -11,5 +11,4 @@ public interface TickerService {
     Ticker update(Long id, Ticker update);
     void delete(Long id);
     void cleanUp();
-    Integer getPeriodDivisionsCount();
 }

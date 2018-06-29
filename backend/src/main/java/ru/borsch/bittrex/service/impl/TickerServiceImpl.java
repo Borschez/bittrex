@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.borsch.bittrex.components.Settings;
 import ru.borsch.bittrex.model.Ticker;
 import ru.borsch.bittrex.repositories.TickerRepository;
 import ru.borsch.bittrex.service.TickerService;
@@ -17,11 +18,8 @@ import java.util.List;
 @Transactional
 public class TickerServiceImpl implements TickerService {
 
-    @Value("${track.period}")
-    private Integer trackPeriod;
-
-    @Value("${track.period.divisions}")
-    private Integer periodDivisionsCount;
+    @Autowired
+    private Settings settings;
 
     @Autowired
     private TickerRepository tickerRepository;
@@ -61,13 +59,8 @@ public class TickerServiceImpl implements TickerService {
 
     @Override
     public void cleanUp() {
-        Date range = DateUtils.addMilliseconds(new Date(), -1*trackPeriod);
+        Date range = DateUtils.addMilliseconds(new Date(), -1*this.settings.getTrackPeriod());
 
         tickerRepository.deleteByTimeStampBefore(range);
-    }
-
-    @Override
-    public Integer getPeriodDivisionsCount() {
-        return periodDivisionsCount;
     }
 }

@@ -40,7 +40,7 @@ export class MarketsListComponent implements OnInit {
 
     this.getMarkets();
 
-    /*this.commonService.getSettings()
+    this.commonService.getSettings()
       .subscribe( settings =>{
         this.refreshPeriod = settings.refreshPeriod;
         console.log("refresh.period: "+this.refreshPeriod );
@@ -50,7 +50,7 @@ export class MarketsListComponent implements OnInit {
           }, this.refreshPeriod );
         }
 
-      });*/
+      });
   }
 
   ngOnDestroy() {

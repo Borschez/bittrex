@@ -8,6 +8,7 @@ import { registerLocaleData } from '@angular/common';
 import { AppComponent } from './app.component';
 import { MarketsListComponent } from './markets-list/markets-list.component';
 import { MarketService } from './services/market.service';
+import { MarketLogService } from "./services/market-log.service";
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import { CommonService } from './services/common.service';
 import { MarketComponent } from './market/market.component';
@@ -15,14 +16,19 @@ import { MatFormFieldModule, MatInputModule, MatTableModule, MatPaginatorModule,
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { WebSocketService } from "./services/web-socket.service";
 import { PushNotificationModule } from 'ng-push-notification';
-import {DecimalPipe} from "@angular/common";
-import {DatePipe} from "@angular/common";
+import { DecimalPipe } from "@angular/common";
+import { DatePipe } from "@angular/common";
+import { MarketLogListComponent } from './market-log-list/market-log-list.component';
+import { SettingsComponent } from './settings/settings.component';
+import {SettingsService} from "./services/settings.service";
 
 @NgModule({
   declarations: [
     AppComponent,
     MarketsListComponent,
-    MarketComponent
+    MarketComponent,
+    MarketLogListComponent,
+    SettingsComponent
   ],
   imports: [
     BrowserModule,
@@ -37,7 +43,7 @@ import {DatePipe} from "@angular/common";
     MatSortModule,
     PushNotificationModule.forRoot()
   ],
-  providers: [MarketService, CommonService, WebSocketService, DecimalPipe, DatePipe],
+  providers: [MarketService, CommonService, WebSocketService, DecimalPipe, DatePipe, MarketLogService, SettingsService],
   bootstrap: [AppComponent]
 })
 

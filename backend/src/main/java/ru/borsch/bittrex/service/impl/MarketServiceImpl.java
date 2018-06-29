@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.borsch.bittrex.components.CommonHelper;
+import ru.borsch.bittrex.components.Settings;
 import ru.borsch.bittrex.math.MarketFunction;
 import ru.borsch.bittrex.model.Market;
 import ru.borsch.bittrex.repositories.MarketRepository;
@@ -21,10 +22,13 @@ public class MarketServiceImpl implements MarketService {
     @Autowired
     private CommonHelper commonHelper;
 
+    @Autowired
+    private Settings settings;
+
 
     private Market prepareMarket(Market market){
         if (market != null) {
-            market.setMarketFunction(new MarketFunction(market.getTickers(), true, commonHelper.getPeriodDivisions(), commonHelper.getBaseUrl()));
+            market.setMarketFunction(new MarketFunction(market.getTickers(), true, this.settings.getPeriodDivisions(), commonHelper.getBaseUrl()));
         }
 
         return market;

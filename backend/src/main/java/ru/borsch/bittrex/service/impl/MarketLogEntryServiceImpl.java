@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.borsch.bittrex.components.Settings;
 import ru.borsch.bittrex.model.Market;
 import ru.borsch.bittrex.model.MarketLogEntry;
 import ru.borsch.bittrex.repositories.MarketLogEntryRepository;
@@ -18,11 +19,11 @@ import java.util.List;
 @Transactional
 public class MarketLogEntryServiceImpl implements MarketLogEntryService {
 
-    @Value("${track.period}")
-    private Integer trackPeriod;
-
     @Autowired
     private MarketLogEntryRepository marketLogEntryRepository;
+
+    @Autowired
+    private Settings settings;
 
     @Override
     public MarketLogEntry findOne(Long id) {
@@ -60,6 +61,11 @@ public class MarketLogEntryServiceImpl implements MarketLogEntryService {
     }
 
     @Override
+    public List<MarketLogEntry> findBySuccessAndImportanceGreaterThanEqual(Boolean success, Integer importance) {
+        return marketLogEntryRepository.findBySuccessAndImportanceGreaterThanEqual(success, importance);
+    }
+
+    @Override
     public MarketLogEntry save(MarketLogEntry marketLogEntry) {
         return marketLogEntryRepository.save(marketLogEntry);
     }
@@ -69,9 +75,11 @@ public class MarketLogEntryServiceImpl implements MarketLogEntryService {
         MarketLogEntry marketLogEntry = marketLogEntryRepository.getOne(id);
 
         marketLogEntry.setMarket(update.getMarket());
+        marketLogEntry.setLast(update.getLast());
         marketLogEntry.setFromStamp(update.getFromStamp());
         marketLogEntry.setToStamp(update.getToStamp());
         marketLogEntry.setPercent(update.getPercent());
+        marketLogEntry.setSuccess(update.getSuccess());
 
         return marketLogEntryRepository.save(marketLogEntry);
     }
@@ -83,8 +91,13 @@ public class MarketLogEntryServiceImpl implements MarketLogEntryService {
 
     @Override
     public void cleanUp(Integer lowImportance) {
-        Date range = DateUtils.addMilliseconds(new Date(), -1*trackPeriod);
+        //cleanUp with low importance
+        Date range = DateUtils.addMilliseconds(new Date(), -1*this.settings.getTrackPeriod());
 
         marketLogEntryRepository.deleteByFromStampBeforeAndImportanceLessThan(range, lowImportance);
+
+        //cleanUp pretenders
+        range = DateUtils.addMilliseconds(new Date(), -1*this.settings.getPretenderStorePeriod()*3600000);
+        marketLogEntryRepository.deleteByFromStampBeforeAndSuccess(range, false);
     }
 }

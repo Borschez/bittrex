@@ -1,0 +1,57 @@
+<div class="panel">
+  <!-- Default panel contents -->
+  <div class="panel-heading">
+    <div class="form-inline mb-lg-1 mt-lg-1">
+      <input class="border col-md-4" placeholder="Filter" aria-label="Filter" matInput (keyup)="applyFilter($event.target.value)">
+      <div class="form-group col-md-4">
+        <label for="pretendersFilter">Show Pretenders:</label>
+        <input type="checkbox" [(ngModel)]="pretendersFilter" id="pretendersFilter" (ngModelChange)="onPretendersFilterChange($event)">
+      </div>
+    </div>
+
+
+  </div>
+
+  <div class="panel-body">
+    <div class="mat-elevation-z8">
+      <mat-table [dataSource]="dataSource" matSort class="table table-hover">
+
+        <!-- ID Column -->
+        <ng-container matColumnDef="logoUrl">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> LOGO </mat-header-cell>
+          <mat-cell *matCellDef="let row"><a routerLink="/market/{{row.market.id}}"><img [src]="row.market.logoUrl" alt="Image Not Found" class="market-image img-thumbnail"></a></mat-cell>
+        </ng-container>
+
+        <!-- Progress Column -->
+        <ng-container matColumnDef="marketName">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> MARKET </mat-header-cell>
+          <mat-cell *matCellDef="let row"><a href="https://www.tradingview.com/chart/?symbol={{row.market.currencyName+row.market.baseCurrencyName}}">{{row.market.name}}</a></mat-cell>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="percent">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> PERCENT </mat-header-cell>
+          <mat-cell *matCellDef="let row">{{row.percent|number:'2.3-3'}} % </mat-cell>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="fromStamp">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> FROM </mat-header-cell>
+          <mat-cell *matCellDef="let row"> {{row.fromStamp|date:'medium':'+0300':'ru'}} </mat-cell>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="toStamp">
+          <mat-header-cell *matHeaderCellDef mat-sort-header> TO </mat-header-cell>
+          <mat-cell *matCellDef="let row">{{row.toStamp|date:'medium':'+0300':'ru'}}</mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns" class="table-bordered table-info"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;">
+        </mat-row>
+      </mat-table>
+      <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [pageSize]="10"></mat-paginator>
+
+    </div>
+  </div>
+</div>

@@ -1,5 +1,6 @@
 package ru.borsch.bittrex.components;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.borsch.bittrex.model.Ticker;
@@ -12,12 +13,9 @@ import java.util.List;
 @Component
 public class MathHelper {
 
-    @Value("${track.interval}")
-    private Integer functionInterval;
+    @Autowired
+    private Settings settings;
 
-    public Integer getFunctionInterval() {
-        return this.functionInterval;
-    }
 
     public List<Ticker> getExtremas(List<Ticker> tickers, boolean strict){
         List<Ticker> result = new ArrayList<>();
@@ -36,8 +34,8 @@ public class MathHelper {
 
     public List<Ticker> getIntervalTickers(Ticker ticker, List<Ticker> tickers){
         List<Ticker> result = new ArrayList<>();
-        Date minTimeStamp = DateUtils.addMilliseconds(ticker.getTimeStamp(), -1 * functionInterval);
-        Date maxTimeStamp = DateUtils.addMilliseconds(ticker.getTimeStamp(), functionInterval);
+        Date minTimeStamp = DateUtils.addMilliseconds(ticker.getTimeStamp(), -1 * this.settings.getTrackInterval());
+        Date maxTimeStamp = DateUtils.addMilliseconds(ticker.getTimeStamp(), this.settings.getTrackInterval());
 
         for (Ticker checkItem : tickers) {
             if(!checkItem.equals(ticker) &&

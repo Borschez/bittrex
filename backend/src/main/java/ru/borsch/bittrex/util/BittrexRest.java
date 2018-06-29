@@ -6,6 +6,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import ru.borsch.bittrex.components.Settings;
 import ru.borsch.bittrex.model.Currency;
 import ru.borsch.bittrex.model.Market;
 import ru.borsch.bittrex.model.pojo.CurrencyPOJO;
@@ -37,8 +38,9 @@ public class BittrexRest {
     @Autowired
     private CurrencyService currencyService;
 
-    @Value("${base.currency.filter}")
-    private String baseCurrencyFilter;
+    @Autowired
+    private Settings settings;
+
 
     public BittrexRest(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.build();
@@ -65,7 +67,7 @@ public class BittrexRest {
 
         List<Market> result = new ArrayList<>();
         for(MarketPOJO pojo: temp.getBody().result){
-            if (!pojo.BaseCurrency.contains(baseCurrencyFilter)) continue;
+            if (!pojo.BaseCurrency.contains(this.settings.getBaseCurrencyFilter())) continue;
             List<Currency> currency = currencyService.findByName(pojo.MarketCurrency);
             List<Currency> baseCurrency = currencyService.findByName(pojo.BaseCurrency);
 

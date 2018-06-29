@@ -24,19 +24,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class ScheduledTasks {
     private static final Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
-
-    @Value("${scheduler.getmarketsummaries.enable}")
-    private Boolean getMarketSummariesEnabled;
-
-    @Value("${base.currency.filter}")
-    private String baseCurrencyFilter;
-
-    @Value("${percent.top.range}")
-    private Double percentTopRange;
 
     @Autowired
     private BittrexRest bittrexRest;
@@ -59,12 +51,15 @@ public class ScheduledTasks {
     @Autowired
     private CommonHelper commonHelper;
 
-    @Scheduled(fixedDelayString = "${scheduler.getmarketsummaries.fixedrate}")
+    @Autowired
+    private Settings settings;
+
+    @Scheduled(fixedDelayString = "${scheduler.getmarketsummaries.interval}")
     public void getMarketSummaries(){
-        if (!getMarketSummariesEnabled) return;
+        if (!this.settings.getGetMarketSummariesEnabled()) return;
         List<MarketSummaryPOJO> marketSummaries = bittrexRest.getMarketsSummaries();
         marketSummaries.stream().forEach(e->{// add tickers from summary
-            if (!e.MarketName.contains(baseCurrencyFilter)) return;
+            if (!e.MarketName.contains(this.settings.getBaseCurrencyFilter())) return;
             List<Market> marketList = marketService.findByName(e.MarketName);
             if (!marketList.isEmpty()){
                 Market market = marketList.get(0);
@@ -81,16 +76,16 @@ public class ScheduledTasks {
 
         marketLogEntryService.cleanUp(4);//clean up old log
 
-
         logger.info("Market Summaries got!");
 
         addMarketHistoryLog(marketService.findAll());
-
+        checkPretendersForSuccess();
         logger.info("Markets History added!");
 
     }
 
     private void addMarketHistoryLog(List<Market> markets){
+        List<MarketLogEntry> pretentersMarketLogEntries = marketLogEntryService.findByImportanceGreaterThanEqual(7);
         for (Market market : markets){
             List<Ticker> tickers = market.getTickers();
             if (tickers.size() < 1) continue;
@@ -99,22 +94,44 @@ public class ScheduledTasks {
             if (marketLogEntryService.findByMarketAndFromStampAndToStamp(market, fromStamp,toStamp).size() > 0) continue;
 
             Double percent = market.getMarketFunction().getPercentDelta();
-            Integer importance = (percent >= percentTopRange)?7:0;
+            Integer importance = (percent >= this.settings.getPercentTopRange())?7:0;
 
-            MarketLogEntry marketLogEntry = new MarketLogEntry(market, fromStamp, toStamp, percent, importance);
+            MarketLogEntry marketLogEntry = new MarketLogEntry(market, tickers.get(tickers.size() - 1).getLast(), fromStamp, toStamp, percent, importance, false);
+            List<MarketLogEntry> existMarketLogEntries = pretentersMarketLogEntries.stream().filter(e -> e.getMarket().getId() == market.getId()).collect(Collectors.toList());
+            if (existMarketLogEntries.size() > 0){
+                MarketLogEntry exist = existMarketLogEntries.get(0);
+                percent = (tickers.get(tickers.size() - 1).getLast() - exist.getLast())*100 /exist.getLast();
+                marketLogEntry.setPercent(percent);
+                marketLogEntryService.update(exist.getId(), marketLogEntry);
+            }else {
+                marketLogEntryService.save(marketLogEntry);
+            }
 
-            marketLogEntryService.save(marketLogEntry);
+        }
+    }
 
-            if (percent >= percentTopRange){
+    private void checkPretendersForSuccess(){
+        List<MarketLogEntry> pretentersMarketLogEntries = marketLogEntryService.findByImportanceGreaterThanEqual(7);
 
-                Map<String,Object> message = new HashMap<>();
+        for (MarketLogEntry pretender : pretentersMarketLogEntries) {
+            List<Ticker> tickers = pretender.getMarket().getTickers();
+            if (tickers.size() < 1 || pretender.getLast() <= 0) continue;
+            Ticker lastTicker = tickers.get(tickers.size() - 1);
+            Double percent = (lastTicker.getLast() - pretender.getLast())*100 / pretender.getLast();
 
-                message.put("market", marketLogEntry.getMarket().getName());
-                message.put("percent", marketLogEntry.getPercent());
-                message.put("marketLogoUrl",  marketLogEntry.getMarket().getLogoUrl());
-                message.put("toStamp",  marketLogEntry.getToStamp());
+            if (percent >= this.settings.getPretenderPercentTopRange()){
+                pretender.setSuccess(true);
+                marketLogEntryService.update(pretender.getId(), pretender);
+
+                Map<String, Object> message = new HashMap<>();
+
+                message.put("market", pretender.getMarket().getName());
+                message.put("percent", pretender.getPercent());
+                message.put("marketLogoUrl", pretender.getMarket().getLogoUrl());
+                message.put("toStamp", pretender.getToStamp());
 
                 template.convertAndSend("/topic/notification", message);
+
             }
         }
     }

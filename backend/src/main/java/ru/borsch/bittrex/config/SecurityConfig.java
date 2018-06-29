@@ -32,10 +32,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.logout()
 				.logoutSuccessUrl("/")
 				.deleteCookies("JSESSIONID", "SESSION")*/
-                .anyRequest().permitAll();
-				/*.and()
+                .anyRequest().permitAll()
+				.and()
 				.csrf()
-				.disable();*/
+				.disable();
 				//.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 		// @formatter:on
 	}

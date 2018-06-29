@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.borsch.bittrex.components.CommonHelper;
 import ru.borsch.bittrex.components.MathHelper;
+import ru.borsch.bittrex.components.Settings;
 import ru.borsch.bittrex.model.Currency;
 import ru.borsch.bittrex.model.Market;
 import ru.borsch.bittrex.model.MarketLogEntry;
@@ -51,6 +52,9 @@ public class RestApiController {
 
     @Autowired
     private SimpMessagingTemplate template;
+
+    @Autowired
+    private Settings settings;
 
     @RequestMapping(value = "/currency/", method = RequestMethod.POST)
     public ResponseEntity<?> createCurrency(@RequestBody Currency currency, UriComponentsBuilder ucBuilder) {
@@ -154,21 +158,28 @@ public class RestApiController {
         return new ResponseEntity<List<MarketSummaryPOJO>>(bittrexMarketSummaries, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/settings/", method = RequestMethod.GET)
+    @RequestMapping(value = "/settings", method = RequestMethod.GET)
     public ResponseEntity<InterfaceSettingsPOJO> getSettings(){
         logger.info("Retrieving interface settings");
 
-        InterfaceSettingsPOJO settings = new InterfaceSettingsPOJO();
-        settings.refreshPeriod = commonHelper.getRefreshPeriod();
+        InterfaceSettingsPOJO settings = this.settings.getSettings();
 
         return new ResponseEntity<InterfaceSettingsPOJO>(settings, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/history/?importance={importance}", method = RequestMethod.GET)
-    public ResponseEntity<List<MarketLogEntry>> getHistory(@PathVariable("importance") int importance){
-        logger.info("Retrieving history with importance="+importance);
+    @RequestMapping(value = "/settings", method = RequestMethod.PUT)
+    public ResponseEntity<?> setSetting(@RequestBody InterfaceSettingsPOJO interfaceSettingsPOJO){
+        logger.info("Setting interface settings");
 
-        List<MarketLogEntry> marketLogEntries = marketLogEntryService.findByImportanceGreaterThanEqual(importance);
+        this.settings.setSettings(interfaceSettingsPOJO);
+
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/log-entry/importance={importance}&showPretenders={showPretenders}", method = RequestMethod.GET)
+    public ResponseEntity<List<MarketLogEntry>> getHistory(@PathVariable("importance") int importance, @PathVariable("showPretenders") boolean showPretenders){
+        logger.info("Retrieving history with importance="+importance + " showPretenders="+showPretenders);
+        List<MarketLogEntry> marketLogEntries = marketLogEntryService.findBySuccessAndImportanceGreaterThanEqual(!showPretenders, importance);
 
         return new ResponseEntity<List<MarketLogEntry>>(marketLogEntries, HttpStatus.OK);
     }
@@ -190,6 +201,4 @@ public class RestApiController {
 
         return new ResponseEntity<MarketLogEntry>(marketLogEntry, HttpStatus.OK);
     }
-
-
 }

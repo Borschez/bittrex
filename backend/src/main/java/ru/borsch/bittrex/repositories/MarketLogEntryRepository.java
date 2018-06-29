@@ -15,8 +15,18 @@ public interface MarketLogEntryRepository extends JpaRepository<MarketLogEntry, 
     List<MarketLogEntry> findByMarket(Market market);
     List<MarketLogEntry> findByImportanceGreaterThanEqual(Integer importance);
     List<MarketLogEntry> findByMarketAndFromStampAndToStamp(Market market, Date fromStamp, Date toStamp);
+    List<MarketLogEntry> findBySuccessAndImportanceGreaterThanEqual(Boolean success, Integer importance);
 
     @Modifying
     @Transactional
     void deleteByFromStampBeforeAndImportanceLessThan(Date expiryDate, Integer lowImportance);
+
+    @Modifying
+    @Transactional
+    void deleteByFromStampBefore(Date expiryDate);
+
+    @Modifying
+    @Transactional
+    void deleteByFromStampBeforeAndSuccess(Date expiryDate, Boolean success);
+
 }

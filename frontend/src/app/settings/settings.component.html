@@ -1,0 +1,45 @@
+<div *ngIf="settings; then thenBlock"> ... </div>
+<ng-template #thenBlock>
+  <h2>Settings</h2>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="form-group">
+        <label for="refreshPeriod">Refresh Period:</label>
+        <input [(ngModel)]="settings.refreshPeriod" placeholder="Refresh Period" class="form-control" id="refreshPeriod">
+      </div>
+      <div class="form-group">
+        <label for="periodDivisions">Period Divisions:</label>
+        <input [(ngModel)]="settings.periodDivisions" placeholder="Period Divisions" class="form-control" id="periodDivisions">
+      </div>
+      <div class="form-group">
+        <label for="trackPeriod">Track Period:</label>
+        <input [(ngModel)]="settings.trackPeriod" placeholder="Track Period" class="form-control" id="trackPeriod">
+      </div>
+      <div class="form-group">
+        <label for="percentTopRange">Percent Top Range:</label>
+        <input [(ngModel)]="settings.percentTopRange" placeholder="Percent Top Range" class="form-control" id="percentTopRange">
+      </div>
+      <div class="form-group">
+        <label for="trackInterval">Track Interval:</label>
+        <input [(ngModel)]="settings.trackInterval" placeholder="Track Interval" class="form-control" id="trackInterval">
+      </div>
+      <div class="form-group">
+        <label for="baseCurrencyFilter">Base Currency Filter:</label>
+        <input [(ngModel)]="settings.baseCurrencyFilter" placeholder="Base Currency Filter" class="form-control" id="baseCurrencyFilter">
+      </div>
+      <div class="form-group">
+        <label for="pretenderStorePeriod">Pretenders Store Period (hours):</label>
+        <input [(ngModel)]="settings.pretenderStorePeriod" placeholder="Pretenders Store Period" class="form-control" id="pretenderStorePeriod">
+      </div>
+      <div class="form-group">
+        <label for="pretenderPercentTopRange">Pretenders Percent Top Range:</label>
+        <input [(ngModel)]="settings.pretenderPercentTopRange" placeholder="Pretenders Percent Top Range" class="form-control" id="pretenderPercentTopRange">
+      </div>
+      <div class="form-group">
+        <label for="getMarketSummariesEnabled">Enable Market Summaries Collect:</label>
+        <input type="checkbox" [(ngModel)]="settings.getMarketSummariesEnabled" id="getMarketSummariesEnabled">
+      </div>
+      <button (click)="save()" class="btn btn-success custom-width">Save</button>
+    </div>
+  </div>
+</ng-template>

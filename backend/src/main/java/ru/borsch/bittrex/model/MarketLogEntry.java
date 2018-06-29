@@ -12,7 +12,6 @@ public class MarketLogEntry {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
-    @JsonIgnore
     @OneToOne
     private Market market;
 
@@ -20,16 +19,21 @@ public class MarketLogEntry {
     private Date toStamp;
     private Double percent;
 
+    private Double last;
+
     private Integer importance;
+    private Boolean success;
 
     MarketLogEntry(){}
 
-    public MarketLogEntry(Market market, Date fromStamp, Date toStamp, Double percent, Integer importance) {
+    public MarketLogEntry(Market market, Double last, Date fromStamp, Date toStamp, Double percent, Integer importance, Boolean success) {
         this.market = market;
+        this.last = last;
         this.fromStamp = fromStamp;
         this.toStamp = toStamp;
         this.percent = percent;
         this.importance = importance;
+        this.success = success;
     }
 
     public Long getId() {
@@ -78,5 +82,21 @@ public class MarketLogEntry {
 
     public void setImportance(Integer importance) {
         this.importance = importance;
+    }
+
+    public Double getLast() {
+        return last;
+    }
+
+    public void setLast(Double last) {
+        this.last = last;
+    }
+
+    public Boolean getSuccess() {
+        return success;
+    }
+
+    public void setSuccess(Boolean success) {
+        this.success = success;
     }
 }

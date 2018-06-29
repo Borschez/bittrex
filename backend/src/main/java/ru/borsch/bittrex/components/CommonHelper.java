@@ -14,12 +14,6 @@ import java.net.UnknownHostException;
 @Component
 public class CommonHelper {
 
-    @Value("${track.period.divisions}")
-    private Integer periodDivisions;
-
-    @Value("${interface.refresh.period}")
-    private Integer refreshPeriod;
-
     @Autowired
     private EmbeddedWebApplicationContext appContext;
 
@@ -38,13 +32,7 @@ public class CommonHelper {
         return scheme + "://" + ip + ":" + port + contextPath;
     }
 
-    public Integer getPeriodDivisions() {
-        return periodDivisions;
-    }
 
-    public Integer getRefreshPeriod() {
-        return refreshPeriod;
-    }
 
 
 }
